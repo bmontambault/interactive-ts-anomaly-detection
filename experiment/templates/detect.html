@@ -1,0 +1,190 @@
+<html>
+<link rel="stylesheet" type="text/css" href="{{css_path}}/static/main.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<body>
+
+
+<div id="canvasContainer">
+</div>
+
+<div>
+{% if instructions %}
+  <h3>Task {{function_set|int+1}} Part {{task}} Instructions</h3>
+  <p> In this task you will try to understand how certain quantities change over time using plots like the one above. </p>
+  <p> Each of these plots will display a number of points indicating how the quantity changes over time, moving from left to right. Some of the points on each plot will be missing, indicating that the value of the quantity at that time is unknown. Your goal will be to correctly indicate the quantity's value at each of these points.</p>
+  <p> On each trial a blue point will appear on the plot. Pressing the "s" key will indicate that you think this point is consistent with the other points visible on the plot. Pressing the "a" key will indicate that you think this point is <b>NOT</b> consistent with the other points visible on the plot. Try this on the plot above</p>
+  <p> Once you are satisfied with your judgement, you may press the "s" key to submit your answer and proceed to the next trial. At any time you may hit the 'a' key to take back your most recent response and revert to the previous trial.</p>
+  <p> You will complete this task for 5 plots in total, and then be given a new set of instructions. For each plot, you will make a total of 33 judgments.</p>
+  <p> Please click begin to proceed to the first plots. </p>
+
+  <button type="button" onclick="window.location.href='{{ url_for( 'detect', experiment=experiment, participant_id=participant_id, task=task, function_set=function_set, trial=trial) }}';">Begin</button>
+  
+{% else %}
+  <p> Please indicate whether the blue point is consistent with the other points visible on the plot.
+  <p> If you think the point is consistent press 's'. If the think the point is <b>NOT</b> consistent press 'a'.
+{% endif %}
+</div>
+
+
+
+</body>
+
+
+<script type="text/javascript">
+  
+  var left_padding = 10
+  var top_padding = 10
+  var n = 0
+  var trial = {{trial}}
+  var experiment = {{experiment}}
+  var function_set = {{function_set}}
+  var max_trial = 4
+  var trainX = {{trainX|safe}}
+  var trainy = {{trainy|safe}}
+  var testX = {{testX|safe}}
+  var testy = {{testy|safe}}
+  var task = '{{task}}'
+  var responses= []
+  var response_times= []
+  var point_size = {{point_size}}
+  var plot_height = {{plot_height}}
+  var plot_width = {{plot_width}}
+  var made_choice = false
+
+  var observedX = trainX.slice();
+  var observedy = trainy.slice();
+
+  var canvas = document.createElement('canvas');
+  canvas.id = "canvas";
+  canvas.width = left_padding + plot_width;
+  canvas.height = top_padding + plot_height;
+  canvas.style.border = "1px solid #d3d3d3";
+
+  var container = document.getElementById("canvasContainer");
+  container.appendChild(canvas);
+
+  plotTrain()
+  plotPoint(testX[n], testy[n], true, '#0000ff', point_size+1)
+
+  {% if instructions %}
+    var instructions = true
+  {% else %}
+    var instructions = false
+  {% endif %}
+
+
+  function plotPoint(x, y, flip_y, color, point_size){
+    
+    if (flip_y){
+      var y = plot_height - y;
+    }
+    var x = left_padding + x;
+    var c=document.getElementById("canvas");
+    var ctx=c.getContext("2d");
+    ctx.beginPath();
+    ctx.arc(x,y,point_size,0,2*Math.PI);
+    ctx.fillStyle = color;
+    ctx.fill()
+    ctx.strokeStyle = '#000000';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+  }
+
+
+  function plotTrain(){
+  	for (var i=0; i<trainX.length; i++){
+  		plotPoint(trainX[i], trainy[i], true, 'black', point_size)
+  	}
+  }
+
+  function plotTest(){
+  	for (var i=0; i<testy.length; i++){
+  		plotPoint(testX[i], testy[i], true, 'red', point_size)
+	 }
+  }
+
+
+  function clearPlot(){
+    var c = document.getElementById("canvas");
+    ctx = c.getContext('2d');
+    ctx.clearRect(0, 0, c.width, c.height);
+  }
+
+
+  function submit(response){
+    responses.push(response)
+    response_times.push(Date.now())
+    clearPlot();
+    plotTrain();
+    n += 1;
+    plotPoint(testX[n], testy[n], true, '#0000ff', point_size+1)
+  	if (n>=testX.length & !instructions){
+      $.ajax({
+          type:"POST",
+          url:"/data",
+          data:JSON.stringify({"function_set":{{function_set}},
+                              "task":{{task}},
+                              "experiment":{{experiment}},
+                              "participant_id":'{{participant_id}}',
+                              "trainX": trainX,
+                              "trainy": trainy,
+                              "testX": testX,
+                              "testy": testy,
+                              "responses": responses,
+                              "response_times": response_times,
+                              }),
+          dataType: 'json',
+          contentType: 'application/json; charset=utf-8'
+      });
+
+      if (trial==max_trial){
+
+        if (experiment == 1){
+          experiment1(task, function_set)
+        } else {
+          experiment2_3(task, function_set)
+        }
+
+      } else {
+        window.location.href="/detect/{{experiment}}/{{participant_id}}/{{task}}/{{function_set}}/" + (trial+1);
+      }
+    }
+  }
+
+
+  function experiment1(task, function_set){
+
+    if (function_set == 1){
+      window.location.href="/demographics/{{experiment}}/{{participant_id}}"
+    } else if (function_set == 0){
+      window.location.href="/predict_instructions/{{experiment}}/{{participant_id}}/1/1/0"
+    }
+  }
+
+
+  function experiment2_3(task, function_set){
+
+    if (function_set == 1 & task == 2){
+      window.location.href="/demographics/{{experiment}}/{{participant_id}}"
+    } else if (function_set == 1 & task == 1){
+      window.location.href="/detect_instructions2/{{experiment}}/{{participant_id}}/2/1/0"
+    } else if (function_set == 0 & task == 2){
+      window.location.href="/detect_instructions/{{experiment}}/{{participant_id}}/1/1/0"
+    } else if (function_set == 0 & task == 1){
+      window.location.href="/detect_instructions2/{{experiment}}/{{participant_id}}/2/0/0"
+    }
+  }
+
+
+  document.onkeyup = function(e) {
+      var key = e.keyCode || e.which;
+      if (key == 83) {
+      	submit(1);
+      } else if (key == 65){
+      	submit(0)
+      }
+    }
+
+
+</script>
+</html>

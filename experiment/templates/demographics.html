@@ -1,0 +1,81 @@
+<html>
+<link rel="stylesheet" type="text/css" href="../../static/main.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<div id="demographics">
+<!-- Demographics style stolen from labinthewild.org experiments -->
+
+<h1> Please tell us about yourself </h1>
+
+<p>
+Your age:
+<input type="radio" name="age" value="18-24"> 18-24
+<input type="radio" name="age" value="25-39"> 25-39
+<input type="radio" name="age" value="40-49"> 40-49
+<input type="radio" name="age" value="50-59"> 50-59
+<input type="radio" name="age" value="60+"> 60+
+<input type="radio" name="age" value="Prefer not answer"> Prefer not answer
+</p>
+
+<p>
+Your gender:
+<input type="radio" name="gender" value="Male"> Male
+<input type="radio" name="gender" value="Female"> Female
+<input type="radio" name="gender" value="Non-binary"> Non-binary
+<input type="radio" name="gender" value="Prefer not to answer"> Prefer not to answer
+</p>
+
+<p>
+Highest degree obtained:
+<input type="radio" name="degree" value="High School"> High School
+<input type="radio" name="degree" value="Bachelors"> Bachelors
+<input type="radio" name="degree" value="Masters"> Masters
+<input type="radio" name="degree" value="PhD"> PhD
+<input type="radio" name="degree" value="Prefer not to answer"> Prefer not to answer
+
+</p>
+
+<p>
+Have you solved problems like this before? :
+<select id="familiar" name="familiar">
+  <option value="yes">yes</option>
+  <option value="no">no</option>
+</select>
+</p>
+
+<p>
+Have you been trained on how to solve problems like this?:
+<select id="trained" name="trained">
+  <option value="yes">yes</option>
+  <option value="no">no</option>
+</select>
+</p>
+
+<button id="button" onclick="submit()">Submit</button>
+</div>
+
+<style>
+</style>
+
+
+<script>
+
+function submit(){
+
+  data = {"experiment":{{experiment}}, "participant_id":'{{participant_id}}'}
+  data['age'] = document.querySelector('input[name="age"]:checked').value;
+  data['gender']=document.querySelector('input[name="gender"]:checked').value;
+  data['degree']=document.querySelector('input[name="degree"]:checked').value;
+  data['familiar']=document.getElementById("familiar").value;
+  data['trained']=document.getElementById("trained").value;
+  $.ajax({
+      type:"POST",
+      url:"/data",
+      data:JSON.stringify(data),
+      dataType: 'json',
+      contentType: 'application/json; charset=utf-8'
+  });
+  window.location.href="{{ url_for( 'debrief', experiment=experiment, participant_id=participant_id ) }}";
+}
+
+</script>
+</html>

@@ -1,0 +1,44 @@
+<html>
+<link rel="stylesheet" type="text/css" href="../../static/main.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<body>
+
+<p>
+<strong>Please copy and paste the following code back on Mechanical Turk before
+closing this window:</strong>
+</p>
+<h2 id="postId">{{participant_id}}</h2>
+
+Thank you again for your participation. Feel free submit any additional comments
+ below.
+</p>
+
+<div> 
+<textarea id="textarea" name="textarea" rows="10" cols="50">Leave feedback here</textarea>
+<br>
+<button id="submitComments" type="button" onclick="submit()">Submit</button>
+<br>
+<div id="submitFeedback"></div>
+</div>
+
+
+</body>
+
+<script>
+
+function submit(){
+
+    var comment = document.getElementById("textarea").value
+    $.ajax({
+        type:"POST",
+        url:"/data",
+        data:JSON.stringify({"experiment":{{experiment}}, "participant_id":'{{participant_id}}', "comment":comment}),
+        dataType: 'json',
+        contentType: 'application/json; charset=utf-8'
+    });
+}
+
+</script>
+
+
+</html>

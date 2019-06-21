@@ -1,0 +1,36 @@
+<html>
+<link rel="stylesheet" type="text/css" href="{{css_path}}/static/main.css">
+<body>
+
+<div>
+<h1>Prediction Study</h1>
+
+The goal of this study is to understand how people learn about relationships in data. Should you choose to participate you will be asked to:
+
+<ul>
+	<li>Use a visualization to answer a question</li>
+	<li>Answer a survey</li>
+	<li>Provide any feedback you wish</li>
+</ul>
+
+<div style="border:1px solid black; height:50%; width:50%; padding:25px 25px 25px 25px; overflow-y: scroll">
+{% include 'full_consent.html' %}
+</div>
+<br>
+
+I have read and understand the information above, and have decided to participate in this study.
+
+
+{% if experiment|int == 1 %}
+	<button type="button" onclick="window.location.href='{{ url_for( 'experiment_1_instructions', experiment=experiment, participant_id=participant_id, task=task, function_set=function_set, trial=trial ) }}';">I Agree</button>
+{% elif experiment|int == 2 %}
+	<button type="button" onclick="window.location.href='{{ url_for( 'experiment_2_instructions', experiment=experiment, participant_id=participant_id, task=task, function_set=function_set, trial=trial ) }}';">I Agree</button>
+{% else %}
+	<button type="button" onclick="window.location.href='{{ url_for( 'experiment_3_instructions', experiment=experiment, participant_id=participant_id, task=task, function_set=function_set, trial=trial ) }}';">I Agree</button>
+{% endif %}
+
+</div>
+</body>
+
+
+</html>

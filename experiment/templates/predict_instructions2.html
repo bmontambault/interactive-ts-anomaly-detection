@@ -1,0 +1,15 @@
+<html>
+<link rel="stylesheet" type="text/css" href="{{css_path}}/static/main.css">
+<body>
+
+<h3>Task {{function_set|int+1}} Part {{task}} Instructions</h3>
+
+  <p> You have completed part 1 of task 1, and will now proceed to part 2 of task 1.</p>
+
+  <p> You will complete the same task as in task 1 for 5 plots in total, making 33 judgments for each plot. </p>
+
+<br>
+<button type="button" onclick="window.location.href='{{ url_for( 'predict', experiment=experiment, participant_id=participant_id, task=task, function_set=function_set, trial=trial) }}';">Begin</button>
+
+</body>
+</html>

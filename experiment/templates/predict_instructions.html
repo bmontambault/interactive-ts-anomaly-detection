@@ -1,0 +1,113 @@
+<html>
+<link rel="stylesheet" type="text/css" href="{{css_path}}/static/main.css">
+<body>
+
+<div id="canvasContainer">
+</div>
+
+{% if instructions %}
+	<h3>Task {{task}} Part {{function_set|int+1}} Instructions</h3>
+	<p> In this task you will try to understand how certain quantities change over time using plots like the one above. </p>
+	<p> Each of these plots will display a number of points indicating how the quantity changes over time, moving from left to right. Some of the points on each plot will be missing, indicating that the value of the quantity at that time is unknown. Your goal will be to correctly indicate the quantity's value at each of these points.</p>
+	<p> On each trial a vertical line will appear on the plot indicating where you will make your next judgment. Clicking anywhere on the plot will cause a blue point to appear at that point on the vertical line, allowing you to indicate your judgement. Try this on the plot above</p>
+	<p> Once you are satisfied with your judgement, you may press the "s" key to submit your answer and proceed to the next trial. At any time you may hit the 'a' key to take back your most recent response and revert to the previous trial.</p>
+	<p> You will complete this task for 5 plots in total, and then be given a new set of instructions. For each plot, you will make a total of 33 judgments.</p>
+	<p> Please click begin to proceed to the first plots </p>
+
+	<br>
+
+	<button type="button" onclick="window.location.href='{{ url_for( 'predict', experiment=experiment, participant_id=participant_id, task=task, function_set=function_set, trial=trial) }}';">Begin</button>
+
+{% else %}
+	<p> Please indicate the correct value of the point at the time indicated by the blue line.
+	<p> Please click along the blue line to say what you think the value will be at that time.
+	<p> Once you have selected a position along the line, <b> hit the 's' key to submit your answer. </b>
+	<p> At any time you may hit the 'a' key to take back your most recent response.
+{% endif %}
+
+</body>
+
+
+<script type="text/javascript">
+	
+	var point_size = {{point_size}}
+	var trainX = {{trainX|safe}}
+	var trainy = {{trainy|safe}}
+	var testX = {{testX|safe}}
+	var plot_height = {{plot_height}}
+  	var plot_width = {{plot_width}}
+	var left_padding = 10
+  	var top_padding = 10
+
+function plotPoint(x, y, flip_y, color, point_size){
+    
+    if (flip_y){
+      var y = plot_height - y;
+    }
+    var x = left_padding + x;
+    var c=document.getElementById("canvas");
+    var ctx=c.getContext("2d");
+    ctx.beginPath();
+    ctx.arc(x,y,point_size,0,2*Math.PI);
+    ctx.fillStyle = color;
+    ctx.fill()
+    ctx.strokeStyle = '#000000';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+  }
+
+
+  function plotTrain(){
+  	for (var i=0; i<trainX.length; i++){
+  		plotPoint(trainX[i], trainy[i], true, 'black', point_size)
+  	}
+  }
+
+function extrapCue(x){
+
+  	var x = left_padding + x
+    var c=document.getElementById("canvas");
+    var ctx=c.getContext("2d");
+    ctx.beginPath();
+    ctx.moveTo(x,0);
+    ctx.lineTo(x,plot_height);
+    ctx.strokeStyle = '#0000ff';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+  }
+
+
+function click(){
+
+    var x = testX;  
+    var c=document.getElementById("canvas");
+    var ctx=c.getContext("2d");
+    ctx.beginPath();
+    ctx.moveTo(x+left_padding,0);
+
+    ctx.lineTo(x+left_padding,plot_height+top_padding);
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = (point_size+1)*Math.PI
+    ctx.stroke();
+    
+    y = Math.min(event.clientY - top_padding, plot_height);
+    plotPoint(x, y, false, '#0000ff', point_size+1);
+    extrapCue(x);
+  }
+
+
+  var canvas = document.createElement('canvas');
+  canvas.id = "canvas";
+  canvas.width = left_padding + plot_width;
+  canvas.height = top_padding + plot_height;
+  canvas.style.border = "1px solid #d3d3d3";
+
+  var container = document.getElementById("canvasContainer");
+  container.appendChild(canvas);
+  plotTrain();
+  extrapCue(testX);
+  canvas.onclick = click
+
+
+</script>
+</html>
