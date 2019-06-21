@@ -300,7 +300,7 @@ def experiment_3():
 def data():
     
     d = request.json
-    with open(f"results/{datetime.utcnow().strftime('%Y%m%d%H%M%S%f')}.json", 'w') as f:
+    with open(path + f"/results/{datetime.utcnow().strftime('%Y%m%d%H%M%S%f')}.json", 'w') as f:
         json.dump(d, f)
     return ''
     
