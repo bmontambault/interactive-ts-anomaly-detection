@@ -82,9 +82,9 @@ def predict_instructions(experiment, participant_id, task, function_set, trial):
     test_size = config["test_size"]
     
     if int(experiment) < 3:
-        data_path = path + '/../data/{}_sample.csv'.format(['rq','sm_lin'][int(function_set)])
+        data_path = path + '/series/{}_sample.csv'.format(['rq','sm_lin'][int(function_set)])
     else:
-        data_path = path + '/../data/{}_sample.csv'.format(['tech','health'][int(function_set)])
+        data_path = path + '/series/{}_sample.csv'.format(['tech','health'][int(function_set)])
     
     data = pd.read_csv(data_path)
     y = data.values[:,int(trial)]
@@ -139,7 +139,7 @@ def predict(experiment, participant_id, task, function_set, trial):
     plot_width = config["plot_width"]
     padding = config["padding"]
     
-    data_path = path + '/../data/{}{}.csv'.format(['rq_task','sm_lin_task'][int(function_set)],task)
+    data_path = path + '/series/{}{}.csv'.format(['rq_task','sm_lin_task'][int(function_set)],task)
         
     data = pd.read_csv(data_path)
     y = data.values[:,int(trial)]
@@ -175,9 +175,9 @@ def detect_instructions(experiment, participant_id, task, function_set, trial):
     test_size = config["test_size"]
     
     if int(experiment) < 3:
-        data_path = path + '/../data/{}_sample_anomalies.csv'.format(['rq','sm_lin'][int(function_set)])
+        data_path = path + '/series/{}_sample_anomalies.csv'.format(['rq','sm_lin'][int(function_set)])
     else:
-        data_path = path + '/../data/{}_sample_anomalies.csv'.format(['tech','health'][int(function_set)])
+        data_path = path + '/series/{}_sample_anomalies.csv'.format(['tech','health'][int(function_set)])
     
     data = pd.read_csv(data_path)
     y = data.values[:,int(trial)]
@@ -227,9 +227,9 @@ def detect(experiment, participant_id, task, function_set, trial):
     padding = config["padding"]
     
     if int(experiment) < 3:
-        data_path = path + '/../data/{}{}_anomalies.csv'.format(['rq_task','sm_lin_task'][int(function_set)],task)
+        data_path = path + '/series/{}{}_anomalies.csv'.format(['rq_task','sm_lin_task'][int(function_set)],task)
     else:
-        data_path = path + '/../data/{}{}_anomalies.csv'.format(['health_task', 'tech_task'][int(function_set)],task)
+        data_path = path + '/series/{}{}_anomalies.csv'.format(['health_task', 'tech_task'][int(function_set)],task)
     
     print (data_path)
     data = pd.read_csv(data_path)
